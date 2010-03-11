@@ -16,7 +16,7 @@ type
     LabelReproduccion: TLabel;
     LabelAyuda: TLabel;
     PanelMsg: TPanel;
-    Image1: TImage;
+    Image9: TImage;
     Label5: TLabel;
     Image2: TImage;
     Image3: TImage;
@@ -64,6 +64,7 @@ type
     Splitter1: TSplitter;
     Image7: TImage;
     Label1: TLabel;
+    Image1: TImage;
     procedure LabelArchivoMouseEnter(Sender: TObject);
     procedure LabelArchivoMouseLeave(Sender: TObject);
     procedure LabelAyudaClick(Sender: TObject);
@@ -74,6 +75,10 @@ type
     procedure MenuItem19Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure PanelTopMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Image1MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
   private
 
@@ -181,5 +186,29 @@ begin
    ReleaseCapture;
    SendMessage(self.Handle, WM_SYSCOMMAND, 61458, 0) ;
 end;
+
+procedure TFormMain.Image1MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  Image1.Picture.LoadFromFile(ExtractFilePath(application.exename)+'/recursos/btnRepeat-Gray.bmp');
+end;
+
+procedure TFormMain.Image1MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if TComponent(Sender).tag <> 0
+  then
+  begin
+    Image1.Picture.LoadFromFile(ExtractFilePath(application.exename)+'/recursos/btnRepeat-White.bmp');
+    TComponent(Sender).tag := 0;
+  end
+  else
+  begin
+    Image1.Picture.LoadFromFile(ExtractFilePath(application.exename)+'/recursos/btnRepeat-Black.bmp');
+    TComponent(Sender).tag := 1;
+  end;
+end;
+
+
 
 end.

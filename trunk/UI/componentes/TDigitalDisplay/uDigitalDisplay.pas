@@ -14,6 +14,7 @@ type
     FBitmap : TBitmap;             {Bitmap oculto (off-screen) para el dibujo del display}
     FDigits : byte;                {Número de digitos a representar}
     FValue : string;               {Valor a arepresentar}
+    FTransparent : boolean;
     FBckgndColor, FDigitOnColor, FDigitOffColor : TColor;   {Colores}
     FAlignment : TAlignment;       {Alineación horizontal}
     FLeadingZeros : boolean;       {Rellenar con ceros}
@@ -23,6 +24,7 @@ type
     procedure DrawDigit(Digit : byte; x,y : integer;ex,ey : single);
     procedure SetDigits(Value:byte);
     procedure SetValue(Value:String);
+    procedure SetTransparent(Value : Boolean);
     procedure SetBckgndColor(Value : TColor);
     procedure SetDigitOnColor(Value : TColor);
     procedure SetDigitOffColor(Value : TColor);
@@ -41,6 +43,7 @@ type
     property Alignment : TAlignment read FAlignment write SetAlignment default taRightjustify;
     property Digits : byte read FDigits write SetDigits default 4;
     property Value : string read FValue write SetValue;
+    property Transparent : boolean read FTransparent write SetTransparent;
     property BckgndColor : TColor read FBckgndColor write SetBckgndColor;
     property DigitOnColor : TColor read FDigitOnColor write SetDigitOnColor;
     property DigitOffColor : TColor read FDigitOffColor write SetDigitOffColor;
@@ -89,6 +92,7 @@ begin
   {Valores por defecto}
   FDigits:=4;
   FValue:='1997';
+  FTransparent := true;
   FBckgndColor:=clBlack;
   FDigitOnColor:=clLime;
   FDigitOffColor:=$4000;
@@ -135,6 +139,15 @@ begin
   if Value<>FValue then
   begin
     FValue:=Value;
+    repaint;
+  end;
+end;
+
+procedure TDigitalDisplay.SetTransparent(Value : boolean);
+begin
+  if Value<>FTransparent then
+  begin
+    FTransparent:=Value;
     repaint;
   end;
 end;
@@ -230,6 +243,7 @@ begin
   end;
   {Una vez dibujado totalmente el display en el bitmap off-screen, lo volcamos
    al canvas del componente. Resultado ¡No hay parpadeo!}
+  FBitmap.Transparent := FTransparent;
   Canvas.Draw(0,0,FBitmap);
 end;
 
