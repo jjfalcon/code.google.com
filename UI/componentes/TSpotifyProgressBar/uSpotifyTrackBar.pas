@@ -3,8 +3,7 @@ unit uSpotifyTrackBar;
 interface
 
 uses
-  Classes, Controls, Graphics, WinTypes, WinProcs, ComCtrls,
-  GraphTools,
+  Classes, Controls, WinTypes, WinProcs, ComCtrls, Graphics,
   Messages;            //TMessage
 
 type
@@ -12,9 +11,12 @@ type
 { TSlideBar }
 
   TSlideBarKind = (sbVertical, sbHorizontal);
+  TDrawState = set of (dsDisabled, dsPressed, dsHot, dsFocused, dsChecked,
+  	dsExpanded, dsDefaulted, dsThin, dsFlat);
 
   TCustomSlideBar = class(TGraphicControl)
   private
+    FBitmap : TBitmap;             //Bitmap oculto (off-screen) para el dibujo del display
   	FKind: TSlideBarKind;
     FMin: Double;
     FMax: Double;
@@ -51,6 +53,7 @@ type
     property OnDraw: TNotifyEvent read FOnDraw write FOnDraw;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   end;
 
   TSlideBar = class(TCustomSlideBar)
@@ -72,7 +75,6 @@ type
 
   TSpotifySlideBar = class(TSlideBar)
   protected
-    procedure Paint; override;
   end;
 
 
@@ -83,24 +85,45 @@ implementation
 uses
   sysutils;
 
+(*
+function Divide(const Quotient, Divisor: Single): Single;
+begin
+  if Divisor = 0 then
+    Result := 0
+  else
+    Result := Round(Quotient / Divisor) * Divisor;
+end;
+*)
+
 { TCustomSlideBar }
 
 constructor TCustomSlideBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+
+  ControlStyle := ControlStyle+[csOpaque];     //Necesario para evitar el parpadeo
+  FBitmap := TBitmap.Create;
+
   Height := 100;
-  Width := 50;
-  FMax := 100;
-  FMin := 0;
-  FStep := 1;
+  Width  := 50;
+  FMax   := 100;
+  FMin   := 0;
+  FStep  := 1;
   if not Enabled then
 	  FDrawState := [dsDisabled];
+end;
+
+destructor TCustomSlideBar.Destroy;
+begin
+  inherited Destroy;
+  FBitmap.Free;
 end;
 
 function TCustomSlideBar.GetGripRect: TRect;
 var
   X, Y: Integer;
 begin
+
 	if FKind = sbVertical then
   begin
     X := Width div 2;
@@ -110,7 +133,7 @@ begin
     Result.Right := X + 5;
     Result.Top := Y - 5;
     Result.Bottom := Y + 5;
-    InflateRect(Result, 8, 4);
+    InflateRect(Result, 4, 8);
 	end
   else
   begin
@@ -134,11 +157,16 @@ procedure TCustomSlideBar.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
 	Range, Delta: Single;
 begin
+
   inherited MouseMove(Shift, X, Y);
+  if not PtInRect(ClientRect, Point(X, Y)) then exit;
+
   if PtInRect(GetGripRect, Point(X, Y)) then
+  if PtInRect(ClientRect, Point(X, Y)) then
 		DrawState := DrawState + [dsHot]
   else
 		DrawState := DrawState - [dsHot];
+
   if FKind = sbVertical then
   begin
   	Range := Height;
@@ -151,7 +179,7 @@ begin
   end;
   if Range = 0 then
   	Range := 0.000001;
-  if (dsFocused in DrawState) and (FMax > FMin) then
+  if (dsFocused in DrawState)and (FMax > FMin) then
 	  if FKind = sbVertical then
   	  Position := (Range - Delta) / (Range / (FMax - FMin)) + FMin
     else
@@ -162,8 +190,6 @@ procedure TCustomSlideBar.MouseDown(Button: TMouseButton; Shift: TShiftState;
 	X, Y: Integer);
 begin
 	inherited MouseDown(Button, Shift, X, Y);
-//  if Button = mbLeft then
-//	  DrawState := DrawState + [dsFocused];
   if Button = mbLeft then
 	begin
     DrawState := DrawState + [dsFocused];
@@ -180,44 +206,41 @@ begin
 end;
 
 procedure TCustomSlideBar.Paint;
-var
-  DC: HDC;
-  Rect: TRect;
-  X, Y: Integer;
+Var
+  x,y :integer;
+  Rect : TRect;
 begin
-  if Assigned(FOnDraw) then
-    FOnDraw(Self)
-  else
+  Rect           := ClientRect;
+  FBitmap.Width  := ClientRect.Right;
+  FBitmap.Height := ClientRect.Bottom;
+  FBitmap.Canvas.Brush.Color:= clRed;
+  FBitmap.Canvas.FillRect(Rect);
+
+  X := (System.Round(Abs(Position - Min) * ((Width - 10) / (FMax - FMin))) + 5);
+  Y := Height div 2;
+  Rect.Top := Y - 5;
+  Rect.Bottom := Y + 5;
+
+  if true then
   begin
-    DC := Canvas.Handle;
-    Rect := ClientRect;
-    if FKind = sbVertical then
-    begin
-      X := Width div 2;
-      Y := Height - (System.Round(Abs(Position - Min) * ((Height - 10) / (FMax - FMin))) + 5);
-      Rect.Left := X - 1;
-      Rect.Right := X + 1;
-      DrawThemeHorzSplit(DC, Rect, FDrawState);
-      Rect.Top := Y - 1;
-      Rect.Bottom := Y + 1;
-      InflateRect(Rect, 8, 4);
-      FillRect(DC, Rect, COLOR_BTNFACE + 1);
-      DrawThemeVertThumb(DC, Rect, FDrawState);
-    end
-    else
-    begin
-      X := (System.Round(Abs(Position - Min) * ((Width - 10) / (FMax - FMin))) + 5);
-      Y := Height div 2;
-      Rect.Top := Y - 1;
-      Rect.Bottom := Y + 1;
-      DrawThemeVertSplit(DC, Rect, FDrawState);
-      Rect.Left := X - 1;
-      Rect.Right := X + 1;
-      InflateRect(Rect, 4, 8);
-      FillRect(DC, Rect, COLOR_BTNFACE + 1);
-      DrawThemeHorzThumb(DC, Rect, FDrawState);
-    end;
+    FBitmap.Canvas.Brush.color := clGray;
+    FBitmap.Canvas.RoundRect(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom, Rect.Bottom div 2, Rect.Bottom div 2);
   end;
+
+  Rect.Left  := X - 5;
+  Rect.Right := X + 5;
+
+  FBitmap.Canvas.Brush.color := clWhite;
+  FBitmap.Canvas.Ellipse(Rect);
+  if (dsFocused in DrawState) then
+  begin
+    InflateRect(Rect, -3, -3);
+    FBitmap.Canvas.Brush.color := clBlack;
+    FBitmap.Canvas.Ellipse(Rect);
+  end;
+
+  FBitmap.Transparent := true;
+  Canvas.Draw(0,0,FBitmap);
 end;
 
 procedure TCustomSlideBar.SetDrawState(Value: TDrawState);
@@ -225,7 +248,7 @@ begin
 	if Value <> FDrawState then
   begin
 		FDrawState := Value;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -233,6 +256,7 @@ procedure TCustomSlideBar.SetKind(Value: TSlideBarKind);
 var
 	I: Integer;
 begin
+
 	if Value <> FKind then
   begin
   	FKind := Value;
@@ -267,7 +291,7 @@ begin
     Invalidate;
   end;
 end;
-
+(*
 procedure InvalidateControlRect(Control: TControl; Rect: TRect);
 var
 	WinControl: TWinControl absolute Control;
@@ -286,17 +310,17 @@ begin
   else if (Control is TWinControl) and (WinControl.HandleAllocated) then
     InvalidateRect(WinControl.Handle, @Rect, False)
 end;
-
-function Divide(const Quotient, Divisor: Single): Single;
-begin
-  if Divisor = 0 then
-    Result := 0
-  else
-    Result := Round(Quotient / Divisor) * Divisor;
-end;
+*)
 
 procedure TCustomSlideBar.SetPosition(Value: Double);
 begin
+  if Value <> FPosition then
+  begin
+    FPosition := Value;
+    Invalidate;
+  end;
+
+(*
   if Value < FMin then
     Value := FMin
   else if Value > FMax then
@@ -313,6 +337,7 @@ begin
       TCustomSlideBar(FAssociate).Text := FloatToStr(FPosition);
   	InvalidateControlRect(Self, GetGripRect);
   end;
+*)
 end;
 
 procedure TCustomSlideBar.CMEnabledChanged(var Message: TMessage);
@@ -330,31 +355,9 @@ begin
   DrawState := DrawState - [dsHot];
 end;
 
-{ TColorClideBar }
-
-procedure TSpotifySlideBar.Paint;
-var
-  x,y : integer;
-begin
-  inherited;
-exit;
-
-  Canvas.Pen.Style:=psSolid;            {Asignamos el estilo del pen}
-  Canvas.Pen.Mode:=pmCopy;              {Idem modo}
-  Canvas.Pen.Color:=clBlack;
-  Canvas.Brush.Color:=clGray;
-  Canvas.Ellipse(ClientRect);                              //pintar recuadro
-//  Canvas.Rectangle(ClientRect);
-  Canvas.Brush.Color:=clWhite;
-  x := Round(Position);
-  y := 0;
-  Canvas.Ellipse(x, y, x+ClientRect.Bottom,ClientRect.Bottom);
-end;
-
-
 procedure Register;
 begin
-  RegisterComponents('Curso', [TSpotifySlideBar]);
+  RegisterComponents('Spotify', [TSpotifySlideBar]);
 end;
 
 end.
