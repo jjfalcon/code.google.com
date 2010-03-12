@@ -1,4 +1,4 @@
-unit Unit1;
+unit FMain;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   Dialogs, ComCtrls, ExtCtrls, jpeg;
 
 type
-  TForm1 = class(TForm)
+  TFormMain = class(TForm)
     TrackBar1: TTrackBar;
     Panel1: TPanel;
     Image1: TImage;
@@ -23,20 +23,20 @@ type
   end;
 
 var
-  Form1: TForm1;
+  FormMain: TFormMain;
 
 implementation
 
 {$R *.dfm}
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TFormMain.FormCreate(Sender: TObject);
 begin
 
   dd :=TDigitalDisplay.Create(self);
   with dd do
   begin
     parent := panel1;
-    BringToFront;
+//    BringToFront;
     Transparent := true;
     top    := 5;
     left   := 400;
@@ -51,7 +51,7 @@ begin
     parent := panel1;
     Anchors := [akLeft];
 
-    BringToFront;
+//    BringToFront;
     left := 95;
     top := top+8;
 //    top  := image1.Top + 20;
@@ -75,7 +75,7 @@ begin
   end;
 end;
 
-procedure TForm1.TrackBar1Change(Sender: TObject);
+procedure TFormMain.TrackBar1Change(Sender: TObject);
 begin
   sb.position := trackbar1.position;
   dd.value := IntToStr(trackbar1.position);

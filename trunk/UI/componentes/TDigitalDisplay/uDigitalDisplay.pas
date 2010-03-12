@@ -89,6 +89,7 @@ begin
   inherited Create(AOwner);
   ControlStyle:=ControlStyle+[csOpaque];  {Necesario para evitar el parpadeo}
   FBitmap:=TBitmap.Create;                {Creamos el bitmap que no servirá para dibujar el display off-screen}
+
   {Valores por defecto}
   FDigits:=4;
   FValue:='1997';
