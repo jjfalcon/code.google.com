@@ -100,7 +100,6 @@ end;
 constructor TCustomSlideBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-
   ControlStyle := ControlStyle+[csOpaque];     //Necesario para evitar el parpadeo
   FBitmap := TBitmap.Create;
 
@@ -123,7 +122,6 @@ function TCustomSlideBar.GetGripRect: TRect;
 var
   X, Y: Integer;
 begin
-
 	if FKind = sbVertical then
   begin
     X := Width div 2;
@@ -157,7 +155,6 @@ procedure TCustomSlideBar.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
 	Range, Delta: Single;
 begin
-
   inherited MouseMove(Shift, X, Y);
   if not PtInRect(ClientRect, Point(X, Y)) then exit;
 
@@ -224,7 +221,8 @@ begin
   if true then
   begin
     FBitmap.Canvas.Brush.color := clGray;
-    FBitmap.Canvas.RoundRect(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom, Rect.Bottom div 2, Rect.Bottom div 2);
+    FBitmap.Canvas.Rectangle(Rect);
+//    FBitmap.Canvas.RoundRect(Rect.Left, Rect.Top, Rect.Right, Rect.Bottom, Rect.Bottom div 2, Rect.Bottom div 2);
   end;
 
   Rect.Left  := X - 5;
@@ -256,7 +254,6 @@ procedure TCustomSlideBar.SetKind(Value: TSlideBarKind);
 var
 	I: Integer;
 begin
-
 	if Value <> FKind then
   begin
   	FKind := Value;
@@ -291,6 +288,7 @@ begin
     Invalidate;
   end;
 end;
+
 (*
 procedure InvalidateControlRect(Control: TControl; Rect: TRect);
 var

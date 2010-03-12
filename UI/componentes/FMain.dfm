@@ -1,9 +1,9 @@
-object Form1: TForm1
+object FormMain: TFormMain
   Left = 166
   Top = 199
   Width = 769
   Height = 431
-  Caption = 'Form1'
+  Caption = 'FormMain'
   Color = clSilver
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -27,10 +27,10 @@ object Form1: TForm1
   end
   object Panel1: TPanel
     Left = 0
-    Top = 0
+    Top = 356
     Width = 761
     Height = 41
-    Align = alTop
+    Align = alBottom
     TabOrder = 1
     object Image1: TImage
       Left = 1
