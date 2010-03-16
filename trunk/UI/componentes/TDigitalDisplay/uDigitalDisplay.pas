@@ -184,7 +184,7 @@ procedure TDigitalDisplay.Paint;
 Var
   ex, ey : single;   {Escala a la que dibujar el display}
   i, Digito : byte;
-  Incx, x,y, offsetx, offsety :integer;
+  x,y, offsetx, offsety :integer;
   DigitSpace : integer;
   SrcRect : TRect;
   Digitos : byte;
@@ -302,7 +302,7 @@ procedure TDigitalDisplay.MouseDown(Button : TMouseButton; Shift : TShiftState; 
 {Método que se encarga de determinar si se ha pulsado con el ratón sobre un dígito del display.
  En caso afirmativo se dispara el evento correspondiente}
 var
-  i, xt, xoff, yoff, DigitSpace : integer;
+  i, xt, xoff, DigitSpace : integer;
 begin
   inherited MouseDown(Button,Shift,X,Y);
   {Cálculo del offset horizontal}

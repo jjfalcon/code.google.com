@@ -1,6 +1,6 @@
 object FormMain: TFormMain
-  Left = 166
-  Top = 199
+  Left = 215
+  Top = 165
   Width = 769
   Height = 431
   Caption = 'FormMain'
@@ -15,8 +15,8 @@ object FormMain: TFormMain
   PixelsPerInch = 96
   TextHeight = 13
   object TrackBar1: TTrackBar
-    Left = 104
-    Top = 184
+    Left = 80
+    Top = 192
     Width = 153
     Height = 25
     LineSize = 0

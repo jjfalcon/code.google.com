@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   uSpotifyTrackBar, uDigitalDisplay,
-  Dialogs, ComCtrls, ExtCtrls, jpeg;
+  Dialogs, ComCtrls, ExtCtrls, jpeg, Buttons, StdCtrls;
 
 type
   TFormMain = class(TForm)
@@ -29,9 +29,54 @@ implementation
 
 {$R *.dfm}
 
+uses
+
+  uImageButton,
+  uGradient;
+
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
+(*
+  mg := TMultiGauge.Create(self);
+  mg.Parent := self;
+*)
 
+  with TImageButton.Create(self) do
+  try
+    parent  := panel1;//self;
+    left    := 360;
+    width   := 200;
+    height  := 50;
+    onoff   := false;
+    enabled := true;
+    Transparent := true;
+    Autosize := true;
+    Hint := 'otra prueba';
+
+    BitmapUp.LoadFromFile(ExtractFilePath(Application.ExeName)      +'bmp1.bmp');
+    BitmapDown.LoadFromFile(ExtractFilePath(Application.ExeName)    +'bmp2.bmp');
+    BitmapOver.LoadFromFile(ExtractFilePath(Application.ExeName)    +'bmp3.bmp');
+    BitmapDisabled.LoadFromFile(ExtractFilePath(Application.ExeName)+'bmp4.bmp');
+  finally
+  end;
+(*
+  with TGradiente.Create(self) do
+  try
+    //crear
+    parent := self;
+    top    := 0;
+    top    := 0;
+    width  := 100;
+    height := 100;
+
+    //configurar
+    Direccion  := dVertical;
+    ColorDesde := clWhite;
+    ColorHasta := clBlack;
+//    Align      := alClient;
+  finally
+  end;
+*)
   dd :=TDigitalDisplay.Create(self);
   with dd do
   begin
@@ -49,12 +94,11 @@ begin
   begin
     //crear
     parent := panel1;
-    Anchors := [akLeft];
-
 //    BringToFront;
+
+    Anchors := [akLeft];
     left := 95;
     top := top+8;
-//    top  := image1.Top + 20;
     Height := 70;
     Width  := 26;
 //    Align := alClient;
@@ -77,6 +121,7 @@ end;
 
 procedure TFormMain.TrackBar1Change(Sender: TObject);
 begin
+//  mg.Valor := trackbar1.position;
   sb.position := trackbar1.position;
   dd.value := IntToStr(trackbar1.position);
 end;
