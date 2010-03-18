@@ -2,7 +2,8 @@ program Spotify;
 
 uses
   Forms,
-  FMain in 'FMain.pas' {FormMain};
+  FMain in 'FMain.pas' {FormMain},
+  uImageButton in '..\componentes\TImageButton\uImageButton.pas';
 
 {$R *.res}
 
